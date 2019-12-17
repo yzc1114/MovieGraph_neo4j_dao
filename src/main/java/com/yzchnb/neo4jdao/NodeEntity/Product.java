@@ -2,6 +2,8 @@ package com.yzchnb.neo4jdao.NodeEntity;
 
 import org.neo4j.ogm.annotation.*;
 
+import java.util.Objects;
+
 @NodeEntity(label = "Product")
 public class Product {
     @Id
@@ -63,5 +65,20 @@ public class Product {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(productId, product.productId) &&
+                Objects.equals(format, product.format) &&
+                Objects.equals(price, product.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productId, format, price);
     }
 }

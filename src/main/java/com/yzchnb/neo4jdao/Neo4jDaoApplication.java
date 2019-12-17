@@ -6,13 +6,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Neo4jDaoApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         SpringApplication.run(Neo4jDaoApplication.class, args);
         String path = null;
         boolean load = false;
         if(args.length == 0){
-            path = "/Users/purchaser/Desktop/MovieInfos/resAll.json";
-            load = true;
+            path = "/Users/purchaser/Desktop/resAll.json";
+            load = false;
             //System.out.println("需要参数 1: 是否进行数据导入(true/false) 2:(可选) 数据路径");
             //System.exit(-1);
         }

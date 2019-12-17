@@ -5,6 +5,7 @@ import com.yzchnb.neo4jdao.RelationshipEntity.DirectorActorRelation;
 import org.neo4j.ogm.annotation.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @NodeEntity(label = "Actor")
@@ -66,5 +67,18 @@ public class Actor {
                 ", actorCollaborationRelations=" + actorCollaborationRelations +
                 ", directorActorRelations=" + directorActorRelations +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Actor actor = (Actor) o;
+        return name.equals(actor.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

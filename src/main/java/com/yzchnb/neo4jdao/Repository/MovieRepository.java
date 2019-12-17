@@ -1,16 +1,34 @@
 package com.yzchnb.neo4jdao.Repository;
 
-import com.yzchnb.neo4jdao.NodeEntity.Movie;
+import com.alibaba.fastjson.JSONObject;
+import com.yzchnb.neo4jdao.NodeEntity.*;
 import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.annotation.QueryResult;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface MovieRepository extends Neo4jRepository<Movie, Long> {
-    @Query("MATCH (m: Movie) WHERE m.releaseYear = {year} and m.releaseMonth = {month} and m.releaseDay = day return m")
+
+    @Query("MATCH (m:Movie) return count(m)")
+    Integer getMoviesCount();
+
+    @Query("MATCH (m:Movie) return distinct m.releaseYear")
+    List<Integer> getYears();
+
+    @Query("MATCH (m:Movie) where m.releaseWeekDay = {releaseWeekDay} return count(m)")
+    Integer getMoviesCountOfWeekDay(@Param("releaseWeekDay")Integer releaseWeekDay);
+
+    @Query("MATCH (m:Movie) with m, rand() as r order by r return m.title limit {limit}")
+    List<String> getRandomTitles(@Param("limit")Integer limit);
+
+    @Query("MATCH (m: Movie) WHERE m.releaseYear = {year} and m.releaseMonth = {month} and m.releaseDay = {day} return m")
     HashSet<Movie> findMoviesByYearMonthDay(@Param("year")Integer year, @Param("month")Integer month, @Param("day")Integer day);
 
     @Query("MATCH (m:Movie) WHERE m.releaseYear = {year} and m.releaseMonth = {month} return m")
@@ -19,8 +37,8 @@ public interface MovieRepository extends Neo4jRepository<Movie, Long> {
     @Query("MATCH (m:Movie) WHERE m.releaseYear = {year} return m")
     HashSet<Movie> findMoviesByYear(@Param("year")Integer year);
 
-    @Query("MATCH (m:Movie) WHERE m.releaseWeekDay = {weekDay} return m")
-    HashSet<Movie> findMoviesByWeekDay(@Param("weekDay")Integer weekDay);
+    @Query("MATCH (m:Movie) WHERE m.releaseWeekDay = {weekDay} return m skip {startFrom} limit {limitation}")
+    HashSet<Movie> findMoviesByWeekDay(@Param("weekDay")Integer weekDay, @Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
     HashSet<Movie> findMoviesByTitle(@Param("title") String title);
 
@@ -47,4 +65,33 @@ public interface MovieRepository extends Neo4jRepository<Movie, Long> {
 
     @Query("MATCH (m:Movie) where m.ranking <= {ranking} return m order by m.ranking desc skip {startFrom} limit {limitation}")
     HashSet<Movie> findMoviesByRankingLessThanEqual(@Param("ranking")Float ranking, @Param("startFrom")Integer startFrom, @Param("limitation") Integer limitation);
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score > {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreGreaterThan(@Param("score")Float score, @Param("userId")String userId);
+
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score >= {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreGreaterThanEqual(@Param("score")Float score, @Param("userId")String userId);
+
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score < {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreLessThan(@Param("score")Float score, @Param("userId")String userId);
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score <= {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreLessThanEqual(@Param("score")Float score, @Param("userId")String userId);
+
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score > {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreGreaterThan(@Param("score")Float score, @Param("userName")String userName);
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score >= {score} return m as movie, r as review order by review.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreGreaterThanEqual(@Param("score")Float score, @Param("userName")String userName);
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score < {score} return m as movie, r as review order by r.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreLessThan(@Param("score")Float score, @Param("userName")String userName);
+
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score <= {score} return m as movie, r as review order by r.score")
+    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreLessThanEqual(@Param("score")Float score, @Param("userName")String userName);
+
+
 }
