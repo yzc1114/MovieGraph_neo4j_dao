@@ -28,6 +28,9 @@ public interface MovieRepository extends Neo4jRepository<Movie, Long> {
     @Query("MATCH (m:Movie) with m, rand() as r order by r return m.title limit {limit}")
     List<String> getRandomTitles(@Param("limit")Integer limit);
 
+    @Query("MATCH (m:Movie) with m, rand() as r order by r return m limit {limit}")
+    List<Movie> getRandomMovies(@Param("limit")Integer limit);
+
     @Query("MATCH (m: Movie) WHERE m.releaseYear = {year} and m.releaseMonth = {month} and m.releaseDay = {day} return m")
     HashSet<Movie> findMoviesByYearMonthDay(@Param("year")Integer year, @Param("month")Integer month, @Param("day")Integer day);
 
