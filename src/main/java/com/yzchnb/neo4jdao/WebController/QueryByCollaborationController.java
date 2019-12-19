@@ -100,7 +100,12 @@ public class QueryByCollaborationController {
             return a;
         };
         params.put("getDirectorActorCollaborations", p2);
-        return Utils.testQueries(this.getClass(), this, params);
+        return Utils.testQueries(this, params);
+    }
+
+    @GetMapping("/compareIndex")
+    public String compareIndex(@RequestParam Integer times) throws Exception{
+        return Utils.compare(this, times);
     }
 
 }

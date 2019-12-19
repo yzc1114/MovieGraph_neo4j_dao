@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface DirectorActorRepository extends Neo4jRepository<DirectorActorRelation, Long> {
-    @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) return r skip {startFrom} limit {limitation}")
+    @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) return r order by r.count desc skip {startFrom} limit {limitation}")
     List<DirectorActorRelation> getDirectorActorRelations(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
     @Query("MATCH (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return r.count")

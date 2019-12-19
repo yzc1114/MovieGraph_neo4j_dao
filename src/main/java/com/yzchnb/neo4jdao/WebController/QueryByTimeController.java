@@ -101,6 +101,11 @@ public class QueryByTimeController {
         m.put("getMoviesByYearMonthDay", getMoviesByYearMonthDay);
         m.put("getMoviesByYearSeason", getMoviesByYearSeason);
         m.put("getMoviesByWeekDay", getMoviesByWeekDay);
-        return Utils.testQueries(this.getClass(), this, m);
+        return Utils.testQueries(this, m);
+    }
+
+    @GetMapping("/compareIndex")
+    public String compareIndex(@RequestParam Integer times) throws Exception{
+        return Utils.compare(this, times);
     }
 }

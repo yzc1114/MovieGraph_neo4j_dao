@@ -34,6 +34,11 @@ public class QueryByTitleController {
         ParamsProvider p = () -> randomTitles.stream().map(Arrays::asList).collect(Collectors.toList());
         HashMap<String, ParamsProvider> m = new HashMap<>();
         m.put("getMoviesByTitle", p);
-        return Utils.testQueries(this.getClass(), this, m);
+        return Utils.testQueries(this, m);
+    }
+
+    @GetMapping("/compareIndex")
+    public String compareIndex(@RequestParam Integer times) throws Exception{
+        return Utils.compare(this, times);
     }
 }

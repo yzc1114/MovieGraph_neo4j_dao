@@ -105,8 +105,8 @@ public class Utils {
         return JSON.toJSONString(object, SerializerFeature.DisableCircularReferenceDetect);
     }
 
-    public static String testQueries(Class c, Object webController, Map<String, ParamsProvider> method2Provider){
-        ArrayList<Method> methods = new ArrayList<>(Arrays.asList(c.getDeclaredMethods()));
+    public static String testQueries(Object webController, Map<String, ParamsProvider> method2Provider){
+        ArrayList<Method> methods = new ArrayList<>(Arrays.asList(webController.getClass().getDeclaredMethods()));
         methods.removeIf((m) -> !m.getName().startsWith("get"));
         HashMap<String, Float> methods2Time = new HashMap<>();
         for (Method method : methods) {
@@ -123,5 +123,17 @@ public class Utils {
             methods2Time.put(method.getName(), (float)timeSum / (float)paramsProvider.getParams().size());
         }
         return JSON.toJSONString(methods2Time, SerializerFeature.DisableCircularReferenceDetect);
+    }
+
+    public static String compare(Object webController, Integer times) throws Exception{
+        Method testMethod = webController.getClass().getMethod("test", Integer.class);
+        deleteIndices();
+        String no = (String) testMethod.invoke(webController, times);
+        createIndices();
+        String yes = (String) testMethod.invoke(webController, times);
+        JSONObject res = new JSONObject();
+        res.put("withIndices", JSON.parseObject(yes));
+        res.put("withoutIndices", JSON.parseObject(no));
+        return JSON.toJSONString(res);
     }
 }

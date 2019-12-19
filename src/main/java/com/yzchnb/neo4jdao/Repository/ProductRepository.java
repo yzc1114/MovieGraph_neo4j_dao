@@ -10,6 +10,8 @@ import java.util.Set;
 public interface ProductRepository extends Neo4jRepository<Product, Long> {
     Boolean existsByProductId(String productId);
 
+    Product getByProductId(String productId);
+
     @Query("match (p:Product) where p.productId = {productId} and p.format = {format} and p.price = {price} return p limit 1")
     Product findByProductIdAndFormatAndPrice(@Param("productId") String productId,
                                              @Param("format") String format,

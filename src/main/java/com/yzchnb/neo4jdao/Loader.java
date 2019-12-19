@@ -154,14 +154,25 @@ public class Loader {
             ArrayList<ActorCollaborationRelation> acRelationsToBeAdded = new ArrayList<>();
             for (int j = i + 1; j < actorNames.size(); j++) {
                 String collaboratorName = actorNames.get(j);
-                ActorCollaborationRelation relation = actorCollaborationRepository.getActorCollaborationRelationByActorNames(actorName, collaboratorName);
+                //应该从actor已经有的relations中去遍历，看是否有和该人的联系
+                //若没找到则加进去新的
+                Actor actor = name2Actor.get(actorName);
+                Actor collaborator = name2Actor.get(collaboratorName);
+                ActorCollaborationRelation relation = null;
+                for (ActorCollaborationRelation actorCollaborationRelation : actor.getActorCollaborationRelations()) {
+                    if(actorCollaborationRelation.getActor1().equals(actor) && actorCollaborationRelation.getActor2().equals(collaborator)
+                    || actorCollaborationRelation.getActor1().equals(collaborator) && actorCollaborationRelation.getActor2().equals(actor)){
+                        //找到了关系
+                        relation = actorCollaborationRelation;
+                        break;
+                    }
+                }
                 if(relation == null){
                     //new collaboration
                     ActorCollaborationRelation actorCollaborationRelation = new ActorCollaborationRelation(name2Actor.get(actorName), name2Actor.get(collaboratorName), 1);
                     acRelationsToBeAdded.add(actorCollaborationRelation);
                 }else{
                     relation.setCount(relation.getCount() + 1);
-                    actorCollaborationRepository.save(relation);
                 }
             }
 
@@ -169,23 +180,24 @@ public class Loader {
 
             ArrayList<DirectorActorRelation> daRelationsToBeAdded = new ArrayList<>();
             for (Director director : directors) {
-                DirectorActorRelation relation = directorActorRepository.getDirectorActorRelation(actorName, director.getName());
+                DirectorActorRelation relation = null;
+                Actor actor = name2Actor.get(actorName);
+                for (DirectorActorRelation directorActorRelation : actor.getDirectorActorRelations()) {
+                    if(directorActorRelation.getDirector().equals(director)){
+                        //找到了旧的关系
+                        relation = directorActorRelation;
+                    }
+                }
                 if(relation == null){
                     //new collaboration
                     DirectorActorRelation directorActorRelation = new DirectorActorRelation(name2Actor.get(actorName), director, 1);
                     daRelationsToBeAdded.add(directorActorRelation);
                 }else{
                     relation.setCount(relation.getCount() + 1);
-                    directorActorRepository.save(relation);
                 }
             }
-            //daRelationsToBeAdded.forEach(directorActorRepository::save);
             name2Actor.get(actorName).getDirectorActorRelations().addAll(daRelationsToBeAdded);
-//            actor.getActors().addAll(collaborators);
-//            actor.getDirectors().addAll(directors);
         }
-
-        //actors.forEach((a) -> actorRepository.save(a, 2));
 
         movie.setStarrings(starringActors);
         movie.setSupportingActors(supportingActors);
@@ -193,9 +205,6 @@ public class Loader {
         movie.setProducts(products);
         movie.setGenres(genres);
         Object o = movieRepository.save(movie, 3);
-        //System.out.println(o);
-        //actorCollaborationRelations.forEach((r) -> actorCollaborationRelationRepository.save(r));
-        //directorActorRelations.forEach((r) -> directorActorRelationRepository.save(r));
         System.out.println("save movie, id: " + movie.getId());
     }
 

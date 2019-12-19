@@ -56,6 +56,11 @@ public class QueryByRankingController {
         m.put("getMoviesByRankingGreaterThanEqual", p);
         m.put("getMoviesByRankingLessThan", p);
         m.put("getMoviesByRankingLessThanEqual", p);
-        return Utils.testQueries(this.getClass(), this, m);
+        return Utils.testQueries(this, m);
+    }
+
+    @GetMapping("/compareIndex")
+    public String compareIndex(@RequestParam Integer times) throws Exception{
+        return Utils.compare(this, times);
     }
 }

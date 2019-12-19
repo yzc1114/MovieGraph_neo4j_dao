@@ -3,6 +3,8 @@ package com.yzchnb.neo4jdao.RelationshipEntity;
 import com.yzchnb.neo4jdao.NodeEntity.Actor;
 import org.neo4j.ogm.annotation.*;
 
+import java.util.Objects;
+
 @RelationshipEntity(type = "ActorCollaborationRelation")
 public class ActorCollaborationRelation {
     @Id
@@ -54,5 +56,19 @@ public class ActorCollaborationRelation {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActorCollaborationRelation that = (ActorCollaborationRelation) o;
+        return (actor1.equals(that.actor1) &&
+                actor2.equals(that.actor2)) || (actor1.equals(that.actor2) && actor2.equals(that.actor1));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(actor1, actor2);
     }
 }

@@ -2,6 +2,8 @@ package com.yzchnb.neo4jdao.NodeEntity;
 
 import org.neo4j.ogm.annotation.*;
 
+import java.util.Objects;
+
 @NodeEntity(label = "Director")
 public class Director {
     @Id
@@ -60,5 +62,18 @@ public class Director {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Director director = (Director) o;
+        return Objects.equals(name, director.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

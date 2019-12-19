@@ -8,6 +8,14 @@ public class Review {
     @GeneratedValue
     Long id;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Property(name = "helpfulness")
     private String helpfulness;
 
@@ -23,6 +31,9 @@ public class Review {
     @Property(name = "text")
     private String text;
 
+    @Property(name = "mood")
+    private String mood;
+
     @Relationship(type = "ReviewProductRelation")
     private Product product;
 
@@ -37,6 +48,23 @@ public class Review {
         this.text = text;
         this.product = product;
         this.user = user;
+    }
+
+    public Review(String helpfulness, Float score, Long time, String summary, String text, String mood) {
+        this.helpfulness = helpfulness;
+        this.score = score;
+        this.time = time;
+        this.summary = summary;
+        this.text = text;
+        this.mood = mood;
+    }
+
+    public String getMood() {
+        return mood;
+    }
+
+    public void setMood(String mood) {
+        this.mood = mood;
     }
 
     public String getHelpfulness() {

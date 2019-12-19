@@ -45,7 +45,12 @@ public class QueryByActorController {
         ParamsProvider paramsProvider = () -> actorNames.stream().map(Arrays::asList).collect(Collectors.toList());
         params.put("getMoviesOfStarring", paramsProvider);
         params.put("getMoviesOfSupportingActor", paramsProvider);
-        return Utils.testQueries(this.getClass(), this, params);
+        return Utils.testQueries(this, params);
+    }
+
+    @GetMapping("/compareIndex")
+    public String compareIndex(@RequestParam Integer times) throws Exception{
+        return Utils.compare(this, times);
     }
 
 }

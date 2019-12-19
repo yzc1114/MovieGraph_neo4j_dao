@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface ActorCollaborationRepository extends Neo4jRepository<ActorCollaborationRelation, Long> {
 
-    @Query("MATCH (:Actor)-[r:ActorCollaborationRelation]-(:Actor) return r skip {startFrom} limit {limitation}")
+    @Query("MATCH (:Actor)-[r:ActorCollaborationRelation]->(:Actor) return r order by r.count desc skip {startFrom} limit {limitation}")
     List<ActorCollaborationRelation> getActorCollaborationRelations(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
     @Query("MATCH (a1:Actor)-[r:ActorCollaborationRelation]-(a2:Actor) where a1.name = {actorName1} and a2.name = {actorName2} return r.count")
