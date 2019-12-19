@@ -4,3 +4,18 @@ spring:
       username: neo4j
       password: 123456
       uri: http://localhost:7474
+
+  application:
+    name: Neo4j-Service-Provider
+
+
+server:
+  port: 8082
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8080/eureka/
