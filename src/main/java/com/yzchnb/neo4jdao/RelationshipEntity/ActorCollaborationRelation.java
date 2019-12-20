@@ -58,17 +58,8 @@ public class ActorCollaborationRelation {
         this.count = count;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ActorCollaborationRelation that = (ActorCollaborationRelation) o;
-        return (actor1.equals(that.actor1) &&
-                actor2.equals(that.actor2)) || (actor1.equals(that.actor2) && actor2.equals(that.actor1));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(actor1, actor2);
+    public boolean same(ActorCollaborationRelation r){
+        return getActor1().equals(r.getActor1()) && getActor2().equals(r.getActor2()) ||
+                getActor2().equals(r.getActor1()) && getActor1().equals(getActor2());
     }
 }

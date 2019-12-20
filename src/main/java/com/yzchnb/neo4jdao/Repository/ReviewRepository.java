@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ReviewRepository extends Neo4jRepository<Review, Long> {
@@ -13,4 +14,7 @@ public interface ReviewRepository extends Neo4jRepository<Review, Long> {
 
     @Query("Match (review:Review) with review, rand() as r order by r return review limit {limit}")
     Set<Review> getRandomReviews(@Param("limit")Integer limit);
+
+    @Query("MATCH (r:Review) return distinct r.mood")
+    List<String> getMoods();
 }

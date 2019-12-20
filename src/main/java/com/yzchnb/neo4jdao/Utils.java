@@ -102,7 +102,7 @@ public class Utils {
         JSONObject object = new JSONObject();
         object.put("data", o);
         object.put("time", s);
-        return JSON.toJSONString(object, SerializerFeature.DisableCircularReferenceDetect);
+        return JSON.toJSONString(object, SerializerFeature.DisableCircularReferenceDetect, SerializerFeature.PrettyFormat);
     }
 
     public static String testQueries(Object webController, Map<String, ParamsProvider> method2Provider){
@@ -122,7 +122,7 @@ public class Utils {
             }
             methods2Time.put(method.getName(), (float)timeSum / (float)paramsProvider.getParams().size());
         }
-        return JSON.toJSONString(methods2Time, SerializerFeature.DisableCircularReferenceDetect);
+        return JSON.toJSONString(methods2Time, SerializerFeature.DisableCircularReferenceDetect, SerializerFeature.PrettyFormat);
     }
 
     public static String compare(Object webController, Integer times) throws Exception{

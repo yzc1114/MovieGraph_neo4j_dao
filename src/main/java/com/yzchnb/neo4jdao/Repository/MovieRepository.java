@@ -69,32 +69,10 @@ public interface MovieRepository extends Neo4jRepository<Movie, Long> {
     @Query("MATCH (m:Movie) where m.ranking <= {ranking} return m order by m.ranking desc skip {startFrom} limit {limitation}")
     HashSet<Movie> findMoviesByRankingLessThanEqual(@Param("ranking")Float ranking, @Param("startFrom")Integer startFrom, @Param("limitation") Integer limitation);
 
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score > {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreGreaterThan(@Param("score")Float score, @Param("userId")String userId);
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.mood = {mood} return m as movie, r as review order by review.mood")
+    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewMood(@Param("mood")String mood, @Param("userId")String userId);
 
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score >= {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreGreaterThanEqual(@Param("score")Float score, @Param("userId")String userId);
-
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score < {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreLessThan(@Param("score")Float score, @Param("userId")String userId);
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where u.userId = {userId} and r.score <= {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserIdReviewScoreLessThanEqual(@Param("score")Float score, @Param("userId")String userId);
-
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score > {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreGreaterThan(@Param("score")Float score, @Param("userName")String userName);
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score >= {score} return m as movie, r as review order by review.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreGreaterThanEqual(@Param("score")Float score, @Param("userName")String userName);
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score < {score} return m as movie, r as review order by r.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreLessThan(@Param("score")Float score, @Param("userName")String userName);
-
-    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.score <= {score} return m as movie, r as review order by r.score")
-    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewScoreLessThanEqual(@Param("score")Float score, @Param("userName")String userName);
-
+    @Query("MATCH (u:User)-[:UserReviewRelation]-(r:Review)-[:ReviewProductRelation]-(p:Product)-[]-(m:Movie) where {userName} in u.profileNames and r.mood = {mood} return m as movie, r as review order by review.mood")
+    HashSet<JSONObject> findMovieAndReviewsByUserNameReviewMood(@Param("mood")String mood, @Param("userName")String userName);
 
 }

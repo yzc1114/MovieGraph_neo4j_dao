@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,8 +14,14 @@ public interface DirectorActorRepository extends Neo4jRepository<DirectorActorRe
     @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) return r order by r.count desc skip {startFrom} limit {limitation}")
     List<DirectorActorRelation> getDirectorActorRelations(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
+    @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) with r, count(r) as cc order by cc desc return r skip {startFrom} limit {limitation}")
+    List<DirectorActorRelation> getDirectorActorRelationsOptimized(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
+
     @Query("MATCH (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return r.count")
     Integer getDirectorActorCollaborationCount(@Param("actorName")String actorName, @Param("directorName")String directorName);
+
+    @Query("MATCH (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return count(r)")
+    Integer getDirectorActorCollaborationCountOptimized(@Param("actorName")String actorName, @Param("directorName")String directorName);
 
     @Query("match (:Actor)-[r:DirectorActorRelation]-(:Director) with r, rand() as rand order by rand return r limit {limit}")
     Set<DirectorActorRelation> getRandomCollaboration(@Param("limit")Integer limit);
@@ -24,4 +31,7 @@ public interface DirectorActorRepository extends Neo4jRepository<DirectorActorRe
 
     @Query("match (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return r limit 1")
     DirectorActorRelation getDirectorActorRelation(@Param("actorName")String actorName, @Param("directorName") String directorName);
+
+    @Query("match ()-[r:DirectorActorRelation]-() return r skip {startFrom} limit {limitation}")
+    HashSet<DirectorActorRelation> getBatch(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 }

@@ -14,8 +14,15 @@ public interface ActorCollaborationRepository extends Neo4jRepository<ActorColla
     @Query("MATCH (:Actor)-[r:ActorCollaborationRelation]->(:Actor) return r order by r.count desc skip {startFrom} limit {limitation}")
     List<ActorCollaborationRelation> getActorCollaborationRelations(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
+    @Query("MATCH (:Actor)-[r:ActorCollaborationRelation]->(:Actor) with count(r) as cc, r order by cc desc return r desc skip {startFrom} limit {limitation}")
+    List<ActorCollaborationRelation> getActorCollaborationRelationsOptimized(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
+
+
     @Query("MATCH (a1:Actor)-[r:ActorCollaborationRelation]-(a2:Actor) where a1.name = {actorName1} and a2.name = {actorName2} return r.count")
     Integer getActorsCollaborationCount(@Param("actorName1")String actorName1, @Param("actorName2")String actorName2);
+
+    @Query("MATCH (a1:Actor)-[r:ActorCollaborationRelation]-(a2:Actor) where a1.name = {actorName1} and a2.name = {actorName2} return count(r)")
+    Integer getActorsCollaborationCountOptimized(@Param("actorName1")String actorName1, @Param("actorName2")String actorName2);
 
     @Query("match (:Actor)-[r:ActorCollaborationRelation]-(:Actor) with r, rand() as rand order by rand return r limit {limit}")
     Set<ActorCollaborationRelation> getRandomCollaboration(@Param("limit")Integer limit);
@@ -25,4 +32,7 @@ public interface ActorCollaborationRepository extends Neo4jRepository<ActorColla
 
     @Query("MATCH (a1:Actor)-[r:ActorCollaborationRelation]-(a2:Actor) where a1.name = {actorName1} and a2.name = {actorName2} return r limit 1")
     ActorCollaborationRelation getActorCollaborationRelationByActorNames(@Param("actorName1")String actorName1, @Param("actorName2") String actorName2);
+
+    @Query("MATCH (:Actor)-[r:ActorCollaborationRelation]-(:Actor) return r skip {s} limit {l}")
+    HashSet<ActorCollaborationRelation> getBatch(@Param("s")Integer s, @Param("l")Integer l);
 }

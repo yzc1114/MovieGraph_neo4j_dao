@@ -14,7 +14,7 @@ public class Neo4jDaoApplication {
         boolean load = false;
         if(args.length == 0){
             path = "/Users/purchaser/Desktop/resAll.json";
-            load = false;
+            load = true;
             //System.out.println("需要参数 1: 是否进行数据导入(true/false) 2:(可选) 数据路径");
             //System.exit(-1);
         }
@@ -32,8 +32,9 @@ public class Neo4jDaoApplication {
             }
         }
         if(load){
-            //Loader.loadData(path);
+            Loader.loadData(path);
             ReviewLoader.loadData();
+            //Loader.addRelations();
         }
     }
 

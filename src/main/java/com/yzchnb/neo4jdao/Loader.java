@@ -143,6 +143,8 @@ public class Loader {
         replaceGenres(genres);
         replaceProducts(products);
 
+        products = removeDuplicatedProducts(products);
+
         starringActors.forEach((a) -> name2Actor.put(a.getName(), a));
         supportingActors.forEach((a) -> name2Actor.put(a.getName(), a));
         List<String> actorNames = starringActors.stream().map(Actor::getName).collect(Collectors.toList());
@@ -180,20 +182,14 @@ public class Loader {
 
             ArrayList<DirectorActorRelation> daRelationsToBeAdded = new ArrayList<>();
             for (Director director : directors) {
-                DirectorActorRelation relation = null;
-                Actor actor = name2Actor.get(actorName);
-                for (DirectorActorRelation directorActorRelation : actor.getDirectorActorRelations()) {
-                    if(directorActorRelation.getDirector().equals(director)){
-                        //找到了旧的关系
-                        relation = directorActorRelation;
-                    }
-                }
+                DirectorActorRelation relation = directorActorRepository.getDirectorActorRelation(actorName, director.getName());
                 if(relation == null){
                     //new collaboration
-                    DirectorActorRelation directorActorRelation = new DirectorActorRelation(name2Actor.get(actorName), director, 1);
-                    daRelationsToBeAdded.add(directorActorRelation);
+                    relation = new DirectorActorRelation(name2Actor.get(actorName), director, 1);
+                    daRelationsToBeAdded.add(relation);
                 }else{
                     relation.setCount(relation.getCount() + 1);
+                    directorActorRepository.save(relation);
                 }
             }
             name2Actor.get(actorName).getDirectorActorRelations().addAll(daRelationsToBeAdded);
@@ -206,6 +202,78 @@ public class Loader {
         movie.setGenres(genres);
         Object o = movieRepository.save(movie, 3);
         System.out.println("save movie, id: " + movie.getId());
+    }
+
+    public static void addRelations(){
+        addActorRelations();
+    }
+
+    public static void addDirectorActorRelations(){
+        //这是优化关系存储节点的方法。
+        //之前的存储策略，是在关系上建立属性，并根据属性查询关系。
+        //但是实践表明，根据关系上的属性来查询非常缓慢。所以我们查阅资料，得知neo4j在内部会维护节点间关系数量。
+        //所以每对演员间的关系可以采用复数关系的形式，来看看这样是否会更快。
+
+
+        //首先针对演员和导演进行测试。如果有好转，再将演员间的冗余关系也加进来。
+        int s = 0, batchSize = 100;
+        HashMap<String, HashSet<String>> actor2Directors = new HashMap<>();
+        while(true){
+            HashSet<DirectorActorRelation> rs = directorActorRepository.getBatch(s, batchSize);
+            if(rs.size() == 0)
+                break;
+            for (DirectorActorRelation r : rs) {
+                Actor a = r.getActor();
+                Director d = r.getDirector();
+                if(actor2Directors.containsKey(a.getName()) && actor2Directors.get(a.getName()).contains(d.getName())){
+                    continue;
+                }
+                actor2Directors.computeIfAbsent(a.getName(), n -> new HashSet<>());
+                actor2Directors.get(a.getName()).add(d.getName());
+                HashSet<DirectorActorRelation> relations = new HashSet<>();
+                int count = directorActorRepository.getDirectorActorCollaborationCountOptimized(a.getName(), d.getName());
+                for (int i = 0; i < r.getCount() - count; i++) {
+                    relations.add(new DirectorActorRelation(a, d, r.getCount()));
+                }
+                directorActorRepository.save(relations, 1);
+                System.out.println("save new relations count: " + relations.size() + " actor id: " + a.getId() + " director id:" + d.getId());
+            }
+            s += rs.size();
+        }
+
+    }
+
+    public static void addActorRelations() {
+        //接下来就进行演员间关系的优化
+        int s = 0, batchSize = 100;
+        while(true){
+            HashSet<Actor> batch = actorRepository.getBatch(s, batchSize);
+            if(batch.size() == 0)
+                break;
+            for (Actor actor : batch) {
+                ArrayList<ActorCollaborationRelation> relationsOfActor = new ArrayList<>(actor.getActorCollaborationRelations());
+                HashMap<ActorCollaborationRelation, Integer> relations2Count = new HashMap<>();
+                for (int i = 0; i < relationsOfActor.size(); i++) {
+                    for (int j = i + 1; j < relationsOfActor.size(); j++) {
+                        ActorCollaborationRelation r1 = relationsOfActor.get(i);
+                        ActorCollaborationRelation r2 = relationsOfActor.get(j);
+                        if(r1.same(r2)){
+                            relations2Count.computeIfAbsent(r1,  (k) -> 0);
+                            relations2Count.put(r1, relations2Count.get(r1) + 1);
+                        }
+                    }
+                }
+                List<ActorCollaborationRelation> newRelations = new ArrayList<>();
+                relations2Count.forEach((r, c) -> {
+                    ArrayList<ActorCollaborationRelation> relations = new ArrayList<>(r.getCount() - c);
+                    for (int i = 0; i < (r.getCount() - c); i++) {
+                        relations.add(new ActorCollaborationRelation(r.getActor1(), r.getActor2(), r.getCount()));
+                    }
+                    newRelations.addAll(relations);
+                });
+                actorCollaborationRepository.save(newRelations, 1);
+            }
+        }
     }
 
     private static boolean hasProduct(List<Product> products){
@@ -223,8 +291,8 @@ public class Loader {
         if(products == null)
             return false;
         for (Movie savedMovie : movieRepository.findMoviesByTitle(title)) {
-            HashSet<Product> s1 = new HashSet<>(products);
-            HashSet<Product> s2 = new HashSet<>(savedMovie.getProducts());
+            HashSet<String> s1 = products.stream().map(Product::getProductId).collect(Collectors.toCollection(HashSet::new));
+            HashSet<String> s2 = savedMovie.getProducts().stream().map(Product::getProductId).collect(Collectors.toCollection(HashSet::new));
             if(s1.equals(s2))
                 return true;
         }
@@ -259,6 +327,7 @@ public class Loader {
     }
 
     private static void replaceProducts(List<Product> products){
+        //源数据没有清洗干净，有的数据productId会有重复
         for (int i = 0; i < products.size(); i++) {
             Product origin = products.get(i);
             Product p = productRepository.findByProductIdAndFormatAndPrice(origin.getProductId(), origin.getFormat(), origin.getPrice());
@@ -266,5 +335,29 @@ public class Loader {
                 products.set(i, p);
             }
         }
+    }
+
+    private static List<Product> removeDuplicatedProducts(List<Product> products){
+        ArrayList<Product> newProducts = new ArrayList<>();
+        for (Product product : products) {
+            boolean found = false;
+            for (Product newProduct : newProducts) {
+                if(newProduct.getProductId() != null && newProduct.getProductId().equals(product.getProductId())){
+                    if(newProduct.getFormat() == null && newProduct.getPrice() == null){
+                        newProduct.setFormat(product.getFormat()); newProduct.setPrice(product.getPrice());
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if(!found)
+                newProducts.add(product);
+        }
+        HashSet<String> ids = new HashSet<>();
+        for (Product newProduct : newProducts) {
+            ids.add(newProduct.getProductId());
+        }
+        assert ids.size() == newProducts.size();
+        return newProducts;
     }
 }

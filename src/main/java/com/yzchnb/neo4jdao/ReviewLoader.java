@@ -38,20 +38,20 @@ public class ReviewLoader {
     private static BufferedReader br;
 
     public static void main(String[] args) throws Exception {
-        //ReviewLoader.loadData();
-        br = new BufferedReader(new FileReader("/Users/purchaser/Desktop/review.csv"));
-        br.readLine();
-        HashSet<String> keys = new HashSet<>();
-        while(true){
-            String l = br.readLine();
-            if(l == null)
-                break;
-            String s = l.split("\\t")[6];
-            String userId = l.split("\\t")[1];
-            String time = l.split("\\t")[5];
-            keys.add(s + userId + time);
-        }
-        System.out.println(keys.size());
+        ReviewLoader.loadData();
+//        br = new BufferedReader(new FileReader("/Users/purchaser/Desktop/review.csv"));
+//        br.readLine();
+//        HashSet<String> keys = new HashSet<>();
+//        while(true){
+//            String l = br.readLine();
+//            if(l == null)
+//                break;
+//            String s = l.split("\\t")[6];
+//            String userId = l.split("\\t")[1];
+//            String time = l.split("\\t")[5];
+//            keys.add(s + userId + time);
+//        }
+//        System.out.println(keys.size());
     }
 
     public static void loadData() throws Exception{
@@ -89,7 +89,7 @@ public class ReviewLoader {
     private static void loadOneReview(Review review, User user, String productId){
         if(reviewRepository.existsByUserAndReviewTime(user.getUserId(), review.getTime())){
             //重复评论
-            //System.out.println("重复评论：" + review.getSummary());
+            System.out.println("重复评论：" + review.getSummary());
             return;
         }
         Product searchedProduct = productRepository.getByProductId(productId);

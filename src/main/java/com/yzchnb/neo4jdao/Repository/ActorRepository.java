@@ -13,4 +13,7 @@ public interface ActorRepository extends Neo4jRepository<Actor, Long> {
 
     @Query("match (a:Actor) with a, rand() as r order by r return a limit {limit}")
     HashSet<Actor> findRandomActors(@Param("limit")Integer limit);
+
+    @Query("match (a:Actor) return a skip{s} limit l")
+    HashSet<Actor> getBatch(@Param("s")Integer s, @Param("l")Integer l);
 }
