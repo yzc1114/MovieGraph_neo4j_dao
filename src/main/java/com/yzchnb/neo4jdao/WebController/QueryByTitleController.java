@@ -3,6 +3,7 @@ package com.yzchnb.neo4jdao.WebController;
 import com.alibaba.fastjson.JSON;
 import com.yzchnb.neo4jdao.LamdbaDefination.ParamsProvider;
 import com.yzchnb.neo4jdao.Repository.MovieRepository;
+import com.yzchnb.neo4jdao.Repository.ProductRepository;
 import com.yzchnb.neo4jdao.Utils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +23,17 @@ import java.util.stream.Collectors;
 public class QueryByTitleController {
     @Resource
     private MovieRepository movieRepository;
+    @Resource
+    private ProductRepository productRepository;
 
     @GetMapping("/getMoviesByTitle")
     public String getMoviesByTitle(@RequestParam("title")String title){
         return Utils.wrap(() -> movieRepository.findMoviesByTitle(title));
+    }
+
+    @GetMapping("/getMovieProductsByTitle")
+    public String getMovieProductsByTitle(@RequestParam("title")String title){
+        return Utils.wrap(() -> productRepository.findMovieProductsByTitle(title));
     }
 
     @GetMapping("/test")

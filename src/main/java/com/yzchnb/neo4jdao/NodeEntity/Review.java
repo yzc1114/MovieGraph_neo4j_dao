@@ -40,16 +40,6 @@ public class Review {
     @Relationship(type = "ReviewUserRelation")
     private User user;
 
-    public Review(String helpfulness, Float score, Long time, String summary, String text, Product product, User user) {
-        this.helpfulness = helpfulness;
-        this.score = score;
-        this.time = time;
-        this.summary = summary;
-        this.text = text;
-        this.product = product;
-        this.user = user;
-    }
-
     public Review(String helpfulness, Float score, Long time, String summary, String text, String mood) {
         this.helpfulness = helpfulness;
         this.score = score;
@@ -57,6 +47,8 @@ public class Review {
         this.summary = summary;
         this.text = text;
         this.mood = mood;
+        this.user = null;
+        this.product = null;
     }
 
     public String getMood() {

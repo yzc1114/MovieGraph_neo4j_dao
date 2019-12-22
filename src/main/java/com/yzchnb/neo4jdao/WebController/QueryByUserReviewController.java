@@ -1,6 +1,7 @@
 package com.yzchnb.neo4jdao.WebController;
 
 import com.yzchnb.neo4jdao.LamdbaDefination.ParamsProvider;
+import com.yzchnb.neo4jdao.NodeEntity.User;
 import com.yzchnb.neo4jdao.Repository.MovieRepository;
 import com.yzchnb.neo4jdao.Repository.ReviewRepository;
 import com.yzchnb.neo4jdao.Repository.UserRepository;
@@ -25,9 +26,15 @@ public class QueryByUserReviewController {
     @Resource
     private ReviewRepository reviewRepository;
 
+    //////////TODO 接口变了
     @GetMapping("/getMovieAndReviewsByUserNameReviewMood")
-    public String getMovieAndReviewsByUserNameReviewMood(@RequestParam("userId")String userId, @RequestParam("mood")String mood){
-        return Utils.wrap(() -> movieRepository.findMovieAndReviewsByUserNameReviewMood(mood, userId));
+    public String getMovieAndReviewsByUserNameReviewMood(@RequestParam("userName")String userName, @RequestParam("mood")String mood){
+        return Utils.wrap(() -> movieRepository.findMovieAndReviewsByUserNameReviewMood(mood, userName));
+    }
+
+    @GetMapping("/getMovieAndReviewsByUserNameReviewScore")
+    public String getMovieAndReviewsByUserNameReviewScore(@RequestParam("userName")String userName, @RequestParam("score")Float score){
+        return Utils.wrap(() -> movieRepository.findMovieAndReviewsByUserNameReviewScoreGreaterThan(score, userName));
     }
 
     @GetMapping("/getMovieAndReviewsByUserIdReviewMood")
@@ -42,13 +49,11 @@ public class QueryByUserReviewController {
 
         Random random = new Random();
 
-        List<String> randomUserIds = userRepository.getRandomUserIds(times);
-        List<String> randomUserNames = userRepository.getRandomUserNames(times);
-
+        List<User> randomUsers = userRepository.getRandomUsers(times);
         List<String> moods = reviewRepository.getMoods();
 
-        ParamsProvider pForUserId = () -> randomUserIds.stream().map((userId) -> Arrays.asList(userId, moods.get(random.nextInt(moods.size())))).map(Arrays::asList).collect(Collectors.toList());
-        ParamsProvider pForUserNames = () -> randomUserNames.stream().map((userName) -> Arrays.asList(userName,  moods.get(random.nextInt(moods.size())))).map(Arrays::asList).collect(Collectors.toList());
+        ParamsProvider pForUserId = () -> randomUsers.stream().map((user) -> Arrays.asList(user.getUserId(), moods.get(random.nextInt(moods.size())))).collect(Collectors.toList());
+        ParamsProvider pForUserNames = () -> randomUsers.stream().map((user) -> Arrays.asList(user.getProfileNames().iterator().next(),  moods.get(random.nextInt(moods.size())))).collect(Collectors.toList());
 
         HashMap<String, ParamsProvider> m = new HashMap<>();
 

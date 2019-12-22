@@ -22,7 +22,16 @@ public class QueryByTimeController {
 
     @GetMapping("/getMoviesByYear")
     public String getMoviesByYear(@RequestParam("year")Integer year){
-        return Utils.wrap(() -> movieRepository.findMoviesByYear(year));
+        return Utils.wrap(() ->
+                movieRepository.findMoviesByReleaseYear(year)
+        );
+    }
+
+    @GetMapping("/getMovieTitlesByYear")
+    public String getMovieTitlesByYear(@RequestParam("year")Integer year){
+        return Utils.wrap(() ->
+                movieRepository.findMovieTitlesByReleaseYear(year)
+        );
     }
 
     @GetMapping("/getMoviesByYearMonth")
@@ -46,9 +55,25 @@ public class QueryByTimeController {
         });
     }
 
+    @GetMapping("/getMovieTitlesByYearSeason")
+    public String getMovieTitlesByYearSeason(@RequestParam("year")Integer year, @RequestParam("season")Integer season){
+        return Utils.wrap(() -> {
+            HashSet<String> res = new HashSet<>();
+            for(int m = (season - 1) * 3 + 1; m <= season * 3; m++){
+                res.addAll(movieRepository.findMovieTitlesByYearMonth(year, m));
+            }
+            return res;
+        });
+    }
+
     @GetMapping("/getMoviesByWeekDay")
     public String getMoviesByWeekDay(@RequestParam("weekDay")Integer weekDay, @RequestParam("startFrom")Integer startFrom, @RequestParam("limitation")Integer limitation){
         return Utils.wrap(() -> movieRepository.findMoviesByWeekDay(weekDay, startFrom, limitation));
+    }
+
+    @GetMapping("/getMovieTitlesByWeekDay")
+    public String getMovieTitlesByWeekDay(@RequestParam("weekDay")Integer weekDay, @RequestParam("startFrom")Integer startFrom, @RequestParam("limitation")Integer limitation){
+        return Utils.wrap(() -> movieRepository.findMovieTitlesByWeekDay(weekDay, startFrom, limitation));
     }
 
     @GetMapping("/test")

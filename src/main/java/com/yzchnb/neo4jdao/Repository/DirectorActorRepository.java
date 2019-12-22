@@ -14,14 +14,8 @@ public interface DirectorActorRepository extends Neo4jRepository<DirectorActorRe
     @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) return r order by r.count desc skip {startFrom} limit {limitation}")
     List<DirectorActorRelation> getDirectorActorRelations(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
 
-    @Query("MATCH (:Actor)-[r:DirectorActorRelation]-(:Director) with r, count(r) as cc order by cc desc return r skip {startFrom} limit {limitation}")
-    List<DirectorActorRelation> getDirectorActorRelationsOptimized(@Param("startFrom")Integer startFrom, @Param("limitation")Integer limitation);
-
     @Query("MATCH (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return r.count")
     Integer getDirectorActorCollaborationCount(@Param("actorName")String actorName, @Param("directorName")String directorName);
-
-    @Query("MATCH (a:Actor)-[r:DirectorActorRelation]-(d:Director) where a.name = {actorName} and d.name = {directorName} return count(r)")
-    Integer getDirectorActorCollaborationCountOptimized(@Param("actorName")String actorName, @Param("directorName")String directorName);
 
     @Query("match (:Actor)-[r:DirectorActorRelation]-(:Director) with r, rand() as rand order by rand return r limit {limit}")
     Set<DirectorActorRelation> getRandomCollaboration(@Param("limit")Integer limit);

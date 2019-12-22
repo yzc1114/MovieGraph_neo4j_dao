@@ -35,16 +35,22 @@ public class QueryByActorController {
         return Utils.wrap(() -> movieRepository.findMoviesBySupportingActor(supportingActor));
     }
 
+    @GetMapping("/getMoviesOfActor")
+    public String getMoviesOfActor(@RequestParam("actor")String actor){
+        return Utils.wrap(() -> movieRepository.findMoviesByActor(actor));
+    }
+
     @GetMapping("/test")
     public String test(@RequestParam Integer times) throws Exception{
         //首先得到1千个演员的名字。
         HashSet<Actor> randomActors = actorRepository.findRandomActors(times);
         HashMap<String, ParamsProvider> params = new HashMap<>();
         List<String> actorNames = randomActors.stream().map(Actor::getName).collect(Collectors.toList());
-        //1.
+
         ParamsProvider paramsProvider = () -> actorNames.stream().map(Arrays::asList).collect(Collectors.toList());
         params.put("getMoviesOfStarring", paramsProvider);
         params.put("getMoviesOfSupportingActor", paramsProvider);
+        params.put("getMoviesOfActor", paramsProvider);
         return Utils.testQueries(this, params);
     }
 

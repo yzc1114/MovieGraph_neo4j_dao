@@ -111,6 +111,8 @@ public class Utils {
         HashMap<String, Float> methods2Time = new HashMap<>();
         for (Method method : methods) {
             ParamsProvider paramsProvider = method2Provider.get(method.getName());
+            if(paramsProvider == null)
+                continue;
             long timeSum = 0;
             for (List params : paramsProvider.getParams()) {
                 try{

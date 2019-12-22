@@ -50,18 +50,18 @@ public class QueryByCollaborationController {
 
     @GetMapping("/getActorsCollaborationCount")
     public String getActorsCollaborationCount(@RequestParam("actorName1")String actorName1, @RequestParam("actorName2")String actorName2){
-        return Utils.wrap(() -> actorCollaborationRepository.getActorsCollaborationCountOptimized(actorName1, actorName2));
+        return Utils.wrap(() -> actorCollaborationRepository.getActorsCollaborationCount(actorName1, actorName2));
     }
 
     @GetMapping("/getDirectorActorCollaborationCount")
     public String getDirectorActorCollaborationCount(@RequestParam("actorName")String actorName, @RequestParam("directorName")String directorName){
-        return Utils.wrap(() -> directorActorRepository.getDirectorActorCollaborationCountOptimized(actorName, directorName));
+        return Utils.wrap(() -> directorActorRepository.getDirectorActorCollaborationCount(actorName, directorName));
     }
 
     @GetMapping("/getDirectorActorCollaborations")
     public String getDirectorActorCollaborations(@RequestParam("startFrom")Integer startFrom, @RequestParam("limitation")Integer limitation){
 
-        return Utils.wrap(() -> directorActorRepository.getDirectorActorRelationsOptimized(startFrom, limitation).stream().peek((r) -> {
+        return Utils.wrap(() -> directorActorRepository.getDirectorActorRelations(startFrom, limitation).stream().peek((r) -> {
                 r.getActor().setDirectorActorRelations(null);
                 r.getActor().setActorCollaborationRelations(null);
             }).collect(Collectors.toSet())

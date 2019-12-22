@@ -13,9 +13,9 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
     @Query("MATCH (u:User) with u, rand() as r order by r return u.userId limit {limit}")
     List<String> getRandomUserIds(@Param("limit")Integer limit);
 
-    @Query("MATCH (u:User) with u, rand() as r order by r return u.profileNames[0] limit {limit}")
+    @Query("MATCH (u:User) with u, rand() as r order by r return u.profileName[0] limit {limit}")
     List<String> getRandomUserNames(@Param("limit")Integer limit);
 
     @Query("MATCH (u:User) with u, rand() as r order by r return u limit {limit}")
-    List<String> getRandomUsers(@Param("limit")Integer limit);
+    List<User> getRandomUsers(@Param("limit")Integer limit);
 }

@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public interface ProductRepository extends Neo4jRepository<Product, Long> {
@@ -21,4 +22,8 @@ public interface ProductRepository extends Neo4jRepository<Product, Long> {
 
     @Query("MATCH (p:Product) with rand() as r, p order by r return p limit {limit}")
     Set<Product> getRandomProducts(@Param("limit")Integer limit);
+
+
+    @Query("MATCH (m:Movie)-[:OwnsProduct]-(p:Product) where m.title = {title} return p")
+    HashSet<Product> findMovieProductsByTitle(@Param("title")String title);
 }

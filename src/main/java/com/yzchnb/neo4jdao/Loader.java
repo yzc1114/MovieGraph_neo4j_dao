@@ -231,7 +231,7 @@ public class Loader {
                 actor2Directors.computeIfAbsent(a.getName(), n -> new HashSet<>());
                 actor2Directors.get(a.getName()).add(d.getName());
                 HashSet<DirectorActorRelation> relations = new HashSet<>();
-                int count = directorActorRepository.getDirectorActorCollaborationCountOptimized(a.getName(), d.getName());
+                int count = directorActorRepository.getDirectorActorCollaborationCount(a.getName(), d.getName());
                 for (int i = 0; i < r.getCount() - count; i++) {
                     relations.add(new DirectorActorRelation(a, d, r.getCount()));
                 }

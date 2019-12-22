@@ -31,6 +31,11 @@ public class QueryByGenreController {
         return Utils.wrap(() -> movieRepository.findMoviesByGenre(genre, startFrom, limitation));
     }
 
+    @GetMapping("/getMovieTitlesByGenre")
+    public String getMovieTitlesByGenre(@RequestParam("genre")String genre, @RequestParam("startFrom")Integer startFrom, @RequestParam("limitation")Integer limitation){
+        return Utils.wrap(() -> movieRepository.findMovieTitlesByGenre(genre, startFrom, limitation));
+    }
+
     @GetMapping("/test")
     public String test(@RequestParam Integer times) throws Exception{
         List<Genre> genres = new ArrayList<>(genreRepository.getAllGenres());

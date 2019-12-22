@@ -1,5 +1,6 @@
 package com.yzchnb.neo4jdao.NodeEntity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.yzchnb.neo4jdao.RelationshipEntity.ActorCollaborationRelation;
 import com.yzchnb.neo4jdao.RelationshipEntity.DirectorActorRelation;
 import org.neo4j.ogm.annotation.*;
@@ -18,9 +19,11 @@ public class Actor {
     private String name;
 
     @Relationship(type = "ActorCollaborationRelation", direction = Relationship.UNDIRECTED)
+    @JSONField(serialize = false)
     private Set<ActorCollaborationRelation> actorCollaborationRelations = new HashSet<>();
 
     @Relationship(type = "DirectorActorRelation", direction = Relationship.UNDIRECTED)
+    @JSONField(serialize = false)
     private Set<DirectorActorRelation> directorActorRelations = new HashSet<>();
 
     public Set<ActorCollaborationRelation> getActorCollaborationRelations() {
